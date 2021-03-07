@@ -26,10 +26,6 @@ max_tweet_records = 15
 
 # convenience functions
 # -----------------------------------------------------------------------------
-def get_keys():
-    lines = open("twitter.txt", "r").read().splitlines()
-    return lines
-
 
 def extract_arxiv_pids(r):
     pids = []
@@ -69,12 +65,11 @@ def tprepro(tweet_text):
 # -----------------------------------------------------------------------------
 
 # authenticate to twitter API
-keys = get_keys()
 api = twitter.Api(
-    consumer_key=keys[0],
-    consumer_secret=keys[1],
-    access_token_key=keys[2],
-    access_token_secret=keys[3],
+    consumer_key=os.environ.get('CONSUMER_KEY'),
+    consumer_secret=os.environ.get('CONSUMER_SECRET'),
+    access_token_key=os.environ.get('ACCESS_TOKEN_KEY'),
+    access_token_secret=os.environ.get('ACCESS_TOKEN_SECRET'),
 )
 
 # connect to mongodb instance

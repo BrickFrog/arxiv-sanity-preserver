@@ -9,6 +9,7 @@ scikit-learn
 # twitter
 python-twitter
 pytz
+python-decouple
 
 # the following are only for serve.py
 python-dateutil
