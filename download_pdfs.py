@@ -4,6 +4,7 @@ import pickle
 import shutil
 import random
 from urllib.request import urlopen
+from urllib.error import HTTPError
 
 from utils import Config
 
@@ -14,6 +15,11 @@ have = set(os.listdir(Config.pdf_dir))  # get list of all pdfs we already have
 
 numok = 0
 numtot = 0
+numerr = 0
+
+print("Delayed start..")
+time.sleep(6000)
+
 db = pickle.load(open(Config.db_path, "rb"))
 for pid, j in db.items():
 
@@ -28,16 +34,37 @@ for pid, j in db.items():
     try:
         if not basename in have:
             print("fetching %s into %s" % (pdf_url, fname))
+
             req = urlopen(pdf_url, None, timeout_secs)
+
             with open(fname, "wb") as fp:
                 shutil.copyfileobj(req, fp)
             time.sleep(0.05 + random.uniform(0, 0.1))
         else:
             print("%s exists, skipping" % (fname,))
+        
         numok += 1
-    except Exception as e:
+        
+        if numerr > 0:
+            numerr -= 1
+
+    except (HTTPError, ConnectionResetError) as herr:
         print("error downloading: ", pdf_url)
-        print(e)
+
+        numerr += 1
+
+        print("%s, %d" % (str(herr), numerr))
+
+        if numerr >= 10:
+            print("Encountered %d connection errors in a row, sleeping for a bit." % numerr)
+            time.sleep(600)
+            numerr = 0
+
+    except Exception as err:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(err).__name__, err.args)
+        print("error downloading: ", pdf_url)
+        print(message)
 
     print("%d/%d of %d downloaded ok." % (numok, numtot, len(db)))
 

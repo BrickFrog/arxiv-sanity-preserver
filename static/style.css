@@ -2,7 +2,7 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: arial;
-	background-color: #F6F3E5;
+	background-color: #f6f0e5;
 }
 .as {
 	font-size: 14px;
@@ -16,10 +16,10 @@ body {
 	font-weight: bold;
 	font-size: 16px;
 }
-.as a:link{ text-decoration: none; color: #900; }
-.as a:visited{ text-decoration: none; color: #900; }
-.as a:hover{ text-decoration: underline; color: #F00; }
-.as a:active{ text-decoration: none; color: #900; }
+.as a:link{ text-decoration: none; color: #009; }
+.as a:visited{ text-decoration: none; color: #009; }
+.as a:hover{ text-decoration: underline; color: #00F; }
+.as a:active{ text-decoration: none; color: #009; }
 
 .ts a:link{ text-decoration: none; color: #333; }
 .ts a:visited{ text-decoration: none; color: #333; }
@@ -66,13 +66,13 @@ h1 {
 #titdiv {
 	width: auto;
 	height: 70px;
-	background-color: #840000;
+	background-color: #200597;
 	color: white;
 
 	padding-top: 20px;
 	padding-left: 20px;
 
-	border-bottom: 1px solid #540000;
+	border-bottom: 1px solid #000a54;
 }
 #tittxt {
 	width: 500px;

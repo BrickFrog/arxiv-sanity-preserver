@@ -84,10 +84,10 @@ tweets = mdb.tweets  # the "tweets" collection in "arxiv" database
 tweets_top1 = mdb.tweets_top1
 tweets_top7 = mdb.tweets_top7
 tweets_top30 = mdb.tweets_top30
-print("mongodb tweets collection size:", tweets.count())
-print("mongodb tweets_top1 collection size:", tweets_top1.count())
-print("mongodb tweets_top7 collection size:", tweets_top7.count())
-print("mongodb tweets_top30 collection size:", tweets_top30.count())
+print("mongodb tweets collection size:", tweets.estimated_document_count())
+print("mongodb tweets_top1 collection size:", tweets_top1.estimated_document_count())
+print("mongodb tweets_top7 collection size:", tweets_top7.estimated_document_count())
+print("mongodb tweets_top30 collection size:", tweets_top30.estimated_document_count())
 
 # load banned accounts
 banned = {}
@@ -146,7 +146,7 @@ while True:
         tweets.insert_many(to_insert)
     print(
         "processed %d/%d new tweets. Currently maintaining total %d"
-        % (len(to_insert), len(results), tweets.count())
+        % (len(to_insert), len(results), tweets.estimated_document_count())
     )
 
     # run over 1,7,30 days

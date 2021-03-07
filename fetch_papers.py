@@ -53,7 +53,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--search-query",
         type=str,
-        default="cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML",
+        default="cat:q-fin.CP\
+        +OR+cat:q-fin.GN\
+        +OR+cat:q-fin.MF\
+        +OR+cat:q-fin.PM\
+        +OR+cat:q-fin.PR\
+        +OR+cat:q-fin.RM\
+        +OR+cat:q-fin.ST\
+        +OR+cat:q-fin.TR",
         help="query used for arxiv API. See http://arxiv.org/help/api/user-manual#detailed_examples",
     )
     parser.add_argument(
@@ -62,7 +69,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--max-index",
         type=int,
-        default=10000,
+        default=20000,
         help="upper bound on paper index we will fetch",
     )
     parser.add_argument(
@@ -71,7 +78,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--wait-time",
         type=float,
-        default=5.0,
+        default=10.0,
         help="lets be gentle to arxiv API (in number of seconds)",
     )
     parser.add_argument(

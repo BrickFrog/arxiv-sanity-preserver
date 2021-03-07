@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 from utils import Config, safe_pickle_dump
 
-seed(1337)
+seed(42069)
 max_train = 5000  # max number of tfidf training documents (chosen randomly), for memory efficiency
 max_features = 5000
 

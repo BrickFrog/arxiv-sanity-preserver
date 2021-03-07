@@ -1,6 +1,12 @@
 """
 Use imagemagick to convert all pfds to a sequence of thumbnail images
 requires: sudo apt-get install imagemagick
+
+You will be required to overwrite settings for imagemagick, since it
+denies writing for the conversion
+
+see: 
+https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
 """
 
 import os
