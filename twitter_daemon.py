@@ -66,10 +66,10 @@ def tprepro(tweet_text):
 
 # authenticate to twitter API
 api = twitter.Api(
-    consumer_key=os.environ.get('CONSUMER_KEY'),
-    consumer_secret=os.environ.get('CONSUMER_SECRET'),
-    access_token_key=os.environ.get('ACCESS_TOKEN_KEY'),
-    access_token_secret=os.environ.get('ACCESS_TOKEN_SECRET'),
+    consumer_key=os.getenv('CONSUMER_KEY'),
+    consumer_secret=os.getenv('CONSUMER_SECRET'),
+    access_token_key=os.getenv('ACCESS_TOKEN_KEY'),
+    access_token_secret=os.getenv('ACCESS_TOKEN_SECRET'),
 )
 
 # connect to mongodb instance
