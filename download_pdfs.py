@@ -17,9 +17,6 @@ numok = 0
 numtot = 0
 numerr = 0
 
-print("Delayed start..")
-time.sleep(6000)
-
 db = pickle.load(open(Config.db_path, "rb"))
 for pid, j in db.items():
 
