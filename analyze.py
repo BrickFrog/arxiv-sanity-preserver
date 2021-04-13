@@ -2,6 +2,7 @@
 Reads txt files of all papers and computes tfidf vectors for all papers.
 Dumps results to file tfidf.p
 """
+
 import os
 import pickle
 from random import shuffle, seed
@@ -20,9 +21,7 @@ db = pickle.load(open(Config.db_path, "rb"))
 
 # read all text files for all papers into memory
 txt_paths, pids = [], []
-n = 0
-for pid, j in db.items():
-    n += 1
+for n, (pid, j) in enumerate(db.items(), start=1):
     idvv = "%sv%d" % (j["_rawid"], j["_version"])
     txt_path = os.path.join("data", "txt", idvv) + ".pdf.txt"
     if os.path.isfile(txt_path):  # some pdfs dont translate to txt

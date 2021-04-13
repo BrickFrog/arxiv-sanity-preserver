@@ -58,8 +58,7 @@ def tprepro(tweet_text):
     # take tweet, return set of words
     t = tweet_text.lower()
     t = re.sub(r"[^\w\s]", "", t)  # remove punctuation
-    ws = set([w for w in t.split() if not w.startswith("#")])
-    return ws
+    return {w for w in t.split() if not w.startswith("#")}
 
 
 # -----------------------------------------------------------------------------

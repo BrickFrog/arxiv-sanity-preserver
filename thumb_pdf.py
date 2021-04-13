@@ -9,6 +9,7 @@ see:
 https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
 """
 
+
 import os
 import time
 import shutil
@@ -85,7 +86,7 @@ for i, p in enumerate(pdf_files):
     t0 = time.time()
     while time.time() - t0 < 20:  # give it 15 seconds deadline
         ret = pp.poll()
-        if not (ret is None):
+        if ret is not None:
             # process terminated
             break
         time.sleep(0.1)

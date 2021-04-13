@@ -52,9 +52,7 @@ def _tempfile(*args, **kws):
         try:
             os.remove(name)
         except OSError as e:
-            if e.errno == 2:
-                pass
-            else:
+            if e.errno != 2:
                 raise e
 
 

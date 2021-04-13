@@ -109,34 +109,32 @@ def papers_search(qraw):
         score += 0.0001 * p["tscore"]
         scores.append((score, p))
     scores.sort(reverse=True, key=lambda x: x[0])  # descending
-    out = [x[1] for x in scores if x[0] > 0]
-    return out
+    return [x[1] for x in scores if x[0] > 0]
 
 
 def papers_similar(pid):
     rawpid = strip_version(pid)
 
     # check if we have this paper at all, otherwise return empty list
-    if not rawpid in db:
+    if rawpid not in db:
         return []
 
     # check if we have distances to this specific version of paper id (includes version)
     if pid in sim_dict:
         # good, simplest case: lets return the papers
         return [db[strip_version(k)] for k in sim_dict[pid]]
-    else:
-        # ok we don't have this specific version. could be a stale URL that points to,
-        # e.g. v1 of a paper, but due to an updated version of it we only have v2 on file
-        # now. We want to use v2 in that case.
-        # lets try to retrieve the most recent version of this paper we do have
-        kok = [k for k in sim_dict if rawpid in k]
-        if kok:
-            # ok we have at least one different version of this paper, lets use it instead
-            id_use_instead = kok[0]
-            return [db[strip_version(k)] for k in sim_dict[id_use_instead]]
-        else:
-            # return just the paper. we dont have similarities for it for some reason
-            return [db[rawpid]]
+    # ok we don't have this specific version. could be a stale URL that points to,
+    # e.g. v1 of a paper, but due to an updated version of it we only have v2 on file
+    # now. We want to use v2 in that case.
+    # lets try to retrieve the most recent version of this paper we do have
+    kok = [k for k in sim_dict if rawpid in k]
+    if not kok:
+        # return just the paper. we dont have similarities for it for some reason
+        return [db[rawpid]]
+
+    # ok we have at least one different version of this paper, lets use it instead
+    id_use_instead = kok[0]
+    return [db[strip_version(k)] for k in sim_dict[id_use_instead]]
 
 
 def papers_from_library():
@@ -156,7 +154,7 @@ def papers_from_svm(recent_days=None):
     if g.user:
 
         uid = session["user_id"]
-        if not uid in user_sim:
+        if uid not in user_sim:
             return []
 
         # we want to exclude papers that are already in user library from the result, so fetch them.
@@ -164,7 +162,7 @@ def papers_from_svm(recent_days=None):
         libids = {strip_version(x["paper_id"]) for x in user_library}
 
         plist = user_sim[uid]
-        out = [db[x] for x in plist if not x in libids]
+        out = [db[x] for x in plist if x not in libids]
 
         if recent_days is not None:
             # filter as well to only most recent papers
@@ -182,8 +180,7 @@ def papers_filter_version(papers, v):
     if v != "1":
         return papers  # noop
     intv = int(v)
-    filtered = [p for p in papers if p["_version"] == intv]
-    return filtered
+    return [p for p in papers if p["_version"] == intv]
 
 
 def encode_json(ps, n=10, send_images=True, send_abstracts=True):
@@ -199,14 +196,16 @@ def encode_json(ps, n=10, send_images=True, send_abstracts=True):
     for i in range(min(len(ps), n)):
         p = ps[i]
         idvv = "%sv%d" % (p["_rawid"], p["_version"])
-        struct = {}
-        struct["title"] = p["title"]
-        struct["pid"] = idvv
-        struct["rawpid"] = p["_rawid"]
-        struct["category"] = p["arxiv_primary_category"]["term"]
-        struct["authors"] = [a["name"] for a in p["authors"]]
-        struct["link"] = p["link"]
-        struct["in_library"] = 1 if p["_rawid"] in libids else 0
+        struct = {
+            "title": p["title"],
+            "pid": idvv,
+            "rawpid": p["_rawid"],
+            "category": p["arxiv_primary_category"]["term"],
+            "authors": [a["name"] for a in p["authors"]],
+            "link": p["link"],
+            "in_library": 1 if p["_rawid"] in libids else 0,
+        }
+
         if send_abstracts:
             struct["abstract"] = p["summary"]
         if send_images:
@@ -362,7 +361,7 @@ def comment():
     # process the raw pid and validate it, etc
     try:
         pid = request.form["pid"]
-        if not pid in db:
+        if pid not in db:
             raise Exception("invalid pid")
         version = db[pid]["_version"]  # most recent version of this paper
     except Exception as e:
@@ -398,7 +397,7 @@ def discussions():
     have = set()
     for e in comms_cursor:
         pid = e["pid"]
-        if pid in db and not pid in have:
+        if pid in db and pid not in have:
             have.add(pid)
             papers.append(db[pid])
 
@@ -414,7 +413,7 @@ def toggletag():
 
     # get the tag and validate it as an allowed tag
     tag_name = request.form["tag_name"]
-    if not tag_name in TAGS:
+    if tag_name not in TAGS:
         print("tag name %s is not in allowed tags." % (tag_name,))
         return "Bad tag name. This is most likely Andrej's fault."
 
@@ -547,7 +546,7 @@ def review():
     if not isvalidid(idvv):
         return "NO"  # fail, malformed id. weird.
     pid = strip_version(idvv)
-    if not pid in db:
+    if pid not in db:
         return "NO"  # we don't know this paper. wat
 
     uid = session["user_id"]  # id of logged in user
@@ -567,7 +566,6 @@ def review():
         g.db.execute(
             """delete from library where user_id = ? and paper_id = ?""", [uid, pid]
         )
-        g.db.commit()
         # print('removed %s for %s' % (pid, uid))
         ret = "OFF"
     else:
@@ -577,10 +575,10 @@ def review():
             """insert into library (paper_id, user_id, update_time) values (?, ?, ?)""",
             [rawpid, uid, int(time.time())],
         )
-        g.db.commit()
         # print('added %s for %s' % (pid, uid))
         ret = "ON"
 
+    g.db.commit()
     return ret
 
 
@@ -607,7 +605,7 @@ def friends():
             )
             libids = [strip_version(x["paper_id"]) for x in user_library]
             for lid in libids:
-                if not lid in counts:
+                if lid not in counts:
                     counts[lid] = []
                 counts[lid].append(whom)
 
@@ -625,14 +623,13 @@ def friends():
         # trim counts as well correspondingly
         pid_to_users = {p["_rawid"]: counts.get(p["_rawid"], []) for p in papers}
 
-    if not g.user:
-        msg = "You must be logged in and follow some people to enjoy this tab."
-    else:
         if len(papers) == 0:
             msg = "No friend papers present. Try to extend the time range, or add friends by clicking on your account name (top, right)"
         else:
             msg = "Papers in your friend's libraries:"
 
+    else:
+        msg = "You must be logged in and follow some people to enjoy this tab."
     ctx = default_context(
         papers, render_format="friends", pid_to_users=pid_to_users, msg=msg
     )
@@ -713,16 +710,15 @@ def removefollow():
 def addfollow():
     user = request.form["user"]
     lst = request.form["lst"]
-    if user and lst:
+    if user and lst and lst == "followers":
+        # user clicked "OK" in the followers list, wants to approve some follower. make active.
+        who = user
         username = get_username(session["user_id"])
-        if lst == "followers":
-            # user clicked "OK" in the followers list, wants to approve some follower. make active.
-            who = user
-            whom = username
-            delq = {"who": who, "whom": whom}
-            print("making active in follow collection:", delq)
-            follow_collection.update_one(delq, {"$set": {"active": 1}})
-            return "OK"
+        whom = username
+        delq = {"who": who, "whom": whom}
+        print("making active in follow collection:", delq)
+        follow_collection.update_one(delq, {"$set": {"active": 1}})
+        return "OK"
 
     return "NOTOK"
 
